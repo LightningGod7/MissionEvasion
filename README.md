@@ -18,3 +18,6 @@ HOW TO USE:
 4. enter 'w' to inject PE image hidden in registry to a dummy exe of your choice (will only work if you have existing PE image in the registry key set in config.ini)
 
 
+References:
+https://www.ired.team/offensive-security/code-injection-process-injection/process-hollowing-and-pe-image-relocations
+https://www.codereversing.com/archives/261
