@@ -80,7 +80,11 @@ TO NOTE:
 
 
 References:
-
-
 https://www.ired.team/offensive-security/code-injection-process-injection/process-hollowing-and-pe-image-relocations
 https://www.codereversing.com/archives/261
+
+https://hshrzd.wordpress.com/2025/01/27/process-hollowing-on-windows-11-24h2/
+
+https://ynwarcs.github.io/Win11-24H2-CFG
+
+https://github.com/hasherezade/process_overwriting/tree/master (Used the demo.bin payload from @hasherezade)
