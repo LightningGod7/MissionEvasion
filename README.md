@@ -8,21 +8,24 @@ Anti-Forensics Malware Evasion Techniques
 
 Description
 
-Process Overwriting was developed to bypass the new restrictions introduced in Windows 11 24H2. Unlike Process Hollowing, this technique avoids unmapping and allocating new memory regions. Instead, it overwrites the existing memory regions of a benign process directly.
+Process Overwriting was implemented to bypass the new restrictions introduced in Windows 11 24H2. 
 
-Steps:
+Unlike Process Hollowing, this technique injects and resumes the process from a MEM_IMAGE region as opposed to MEM_PRIVATE. 
 
-A benign process is started in a suspended state.
+Process Overwriting also avoids unmapping and allocating new memory regions.  Instead, it overwrites the existing memory regions of a benign process directly.
 
-Using VirtualProtectEx, the memory regions of the target process are configured with appropriate permissions to allow writing.
+## Steps:
+1. A benign process is started in a suspended state.
 
-The memory region is overwritten with the malicious payload.
+2. Using VirtualProtectEx, the memory regions of the target process are configured with appropriate permissions to allow writing.
 
-The permissions of each section of the payload are patched to match the requirements of the PE.
+3. The memory region is overwritten with the malicious payload.
 
-The process is resumed, executing the malicious payload seamlessly.
+4. The permissions of each section of the payload are patched to match the requirements of the PE.
 
-Advantages of Process Overwriting
+5. The process is resumed, executing the malicious payload seamlessly.
+
+## Advantages of Process Overwriting
 
 Bypassing MEM_PRIVATE Restrictions: Since this technique does not allocate new memory regions, it avoids triggering ZwQueryVirtualMemory checks for MEM_IMAGE.
 
