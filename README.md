@@ -1,4 +1,4 @@
-# Introduction
+![image](https://github.com/user-attachments/assets/31fc6ce5-6933-4e95-a884-6b5dede70cdb)# Introduction
 MissionEvasion is a project that explores advanced techniques for injecting payloads into processes. Initially, the project relied on Process Hollowing, a well-known technique. However, with the release of Windows 11 24H2, significant changes were introduced to the operating system’s process initialization mechanisms, specifically targeting executable memory regions created using VirtualAlloc. To bypass these restrictions, this project introduces Process Overwriting as a novel alternative.
 
 Below, we describe both techniques in detail and provide an explanation of how the Windows 11 24H2 patch impacted traditional Process Hollowing.
@@ -33,7 +33,9 @@ Steps:
 
 5. The process is resumed, executing the injected payload.
 
-This technique is effective because it allows the attacker to inject a payload while masquerading as a legitimate process, making detection more difficult for monitoring tools.
+This technique, while effective for traditional injection & evasion, injects & resumes the process from a MEM_PRIVATE region. As mentioned above, this is no longer possible in Windows 11 24H2
+![image](https://github.com/user-attachments/assets/58a9340a-ee5c-4145-9cbd-f2c2d677c533)
+
 
 # Process Overwriting
 
