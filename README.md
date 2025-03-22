@@ -7,13 +7,13 @@ Below, we describe both techniques in detail and provide an explanation of how t
 
 Windows 11 24H2 introduced native support for Hotpatching, which altered how processes initialize and manage memory. These changes include the addition of a new function:
 
-RtlpInsertOrRemoveScpCfgFunctionTable (called during process initialization).
+_RtlpInsertOrRemoveScpCfgFunctionTable_ (called during process initialization).
 
 Impact on Process Hollowing
 
 The following chain of function calls is now invoked during process initialization:
 
-LdrpInitializeProcess -> LdrpProcessMappedModule -> RtlpInsertOrRemoveScpCfgFunctionTable -> ZwQueryVirtualMemory
+_LdrpInitializeProcess -> LdrpProcessMappedModule -> RtlpInsertOrRemoveScpCfgFunctionTable -> ZwQueryVirtualMemory_
 
 The key function, ZwQueryVirtualMemory, retrieves properties of modules in memory. When invoked with the new argument MemoryImageExtensionInformation, the function verifies that all memory regions are of type MEM_IMAGE. Since traditional Process Hollowing allocates a MEM_PRIVATE region using VirtualAlloc, the function call fails with STATUS_INVALID_ADDRESS, preventing the process from being properly initialized.
 
