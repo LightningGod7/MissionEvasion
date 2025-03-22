@@ -2,7 +2,32 @@
 Anti-Forensics Malware Evasion Techniques
 
 1. Hiding exe files in registry
-2. Process Hollowing
+2. Process Hollowing / Process Overwriting
+
+# Process Overwriting
+
+Description
+
+Process Overwriting was developed to bypass the new restrictions introduced in Windows 11 24H2. Unlike Process Hollowing, this technique avoids unmapping and allocating new memory regions. Instead, it overwrites the existing memory regions of a benign process directly.
+
+Steps:
+
+A benign process is started in a suspended state.
+
+Using VirtualProtectEx, the memory regions of the target process are configured with appropriate permissions to allow writing.
+
+The memory region is overwritten with the malicious payload.
+
+The permissions of each section of the payload are patched to match the requirements of the PE.
+
+The process is resumed, executing the malicious payload seamlessly.
+
+Advantages of Process Overwriting
+
+Bypassing MEM_PRIVATE Restrictions: Since this technique does not allocate new memory regions, it avoids triggering ZwQueryVirtualMemory checks for MEM_IMAGE.
+
+Stealth: Overwriting existing memory regions makes the process appear less suspicious to monitoring tools, as no new allocations are created.
+
 
 TO NOTE:
 1. Should only be compiled as x86
