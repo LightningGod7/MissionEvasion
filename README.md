@@ -72,7 +72,7 @@ TO NOTE:
 1. Should only be compiled as x86
 2. All files selected should be 32-bit
 3. Can only perform process hollowing between same application types (GUI TO GUI or Console to Console)
-4. Example executable (MissionEvasion.exe) uses _c:\windows\syswow64\notepad.exe_ for the dummy process. Check if you have this executable, otherwise you may specify another one (refer to point 2) by changing **DUMMY_PROCESS_FILE_PATH** in config.ini
+4. Example executable (MissionEvasion.exe) uses _c:\windows\syswow64\calc.exe_ for the dummy process. Check if you have this executable, otherwise you may specify another one (refer to point 2) by changing **DUMMY_PROCESS_FILE_PATH** in config.ini
 5. Project was compiled with Visual Studio 2022
 
 1. Apply all your changes to config.ini
