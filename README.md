@@ -13,13 +13,7 @@ Impact on Process Hollowing
 
 The following chain of function calls is now invoked during process initialization:
 
-LdrpInitializeProcess
-
-LdrpProcessMappedModule
-
-RtlpInsertOrRemoveScpCfgFunctionTable
-
-ZwQueryVirtualMemory
+LdrpInitializeProcess -> LdrpProcessMappedModule -> RtlpInsertOrRemoveScpCfgFunctionTable -> ZwQueryVirtualMemory
 
 The key function, ZwQueryVirtualMemory, retrieves properties of modules in memory. When invoked with the new argument MemoryImageExtensionInformation, the function verifies that all memory regions are of type MEM_IMAGE. Since traditional Process Hollowing allocates a MEM_PRIVATE region using VirtualAlloc, the function call fails with STATUS_INVALID_ADDRESS, preventing the process from being properly initialized.
 
