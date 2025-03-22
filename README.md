@@ -3,25 +3,7 @@ MissionEvasion is a project that explores advanced techniques for injecting payl
 
 Below, we describe both techniques in detail and provide an explanation of how the Windows 11 24H2 patch impacted traditional Process Hollowing.
 
-# Process Hollowing
-
-Description
-
-Process Hollowing involves the following steps:
-
-A benign process is started in a suspended state.
-
-The process’s memory region is unmapped.
-
-A malicious PE (Portable Executable) payload is written into the newly allocated memory region using VirtualAlloc.
-
-The relocation sections of the payload are patched.
-
-The process is resumed, executing the injected payload.
-
-This technique is effective because it allows the attacker to inject a payload while masquerading as a legitimate process, making detection more difficult for monitoring tools.
-
-Limitations with Windows 11 24H2
+# Limitations with Windows 11 24H2
 
 Windows 11 24H2 introduced native support for Hotpatching, which altered how processes initialize and manage memory. These changes include the addition of a new function:
 
@@ -41,9 +23,27 @@ ZwQueryVirtualMemory
 
 The key function, ZwQueryVirtualMemory, retrieves properties of modules in memory. When invoked with the new argument MemoryImageExtensionInformation, the function verifies that all memory regions are of type MEM_IMAGE. Since traditional Process Hollowing allocates a MEM_PRIVATE region using VirtualAlloc, the function call fails with STATUS_INVALID_ADDRESS, preventing the process from being properly initialized.
 
+# Process Hollowing
+
+## Description
+
+Steps:
+
+1. A benign process is started in a suspended state.
+
+2. The process’s memory region is unmapped.
+
+3. A malicious PE (Portable Executable) payload is written into the newly allocated memory region using VirtualAlloc.
+
+4. The relocation sections of the payload are patched.
+
+5. The process is resumed, executing the injected payload.
+
+This technique is effective because it allows the attacker to inject a payload while masquerading as a legitimate process, making detection more difficult for monitoring tools.
+
 # Process Overwriting
 
-Description
+## Description
 
 Process Overwriting was implemented to bypass the new restrictions introduced in Windows 11 24H2. 
 
