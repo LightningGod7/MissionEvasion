@@ -1,5 +1,5 @@
 # Introduction
-MissionEvasion is a project that explores advanced techniques for injecting payloads into processes. Initially, the project relied on a well-known technique called "Process Hollowing". However, with the release of Windows 11 24H2, significant changes were introduced to the operating system’s process initialization mechanisms, specifically targeting executable memory regions created using VirtualAlloc. To bypass these restrictions, this project introduces Process Overwriting as a novel alternative.
+MissionEvasion is a project that explores advanced techniques for injecting payloads into processes. Initially, the project relied on a well-known technique called "Process Hollowing". However, with the release of Windows 11 24H2, significant changes were introduced to the operating system’s process initialization mechanisms, specifically targeting executable memory regions created using VirtualAlloc. To bypass these restrictions, this project introduces "Process Overwriting" as a novel alternative.
 
 Below, we describe both techniques in detail and provide an explanation of how the Windows 11 24H2 patch impacted traditional Process Hollowing.
 
@@ -60,7 +60,7 @@ Process Overwriting also avoids unmapping and allocating new memory regions.  In
 
 ## Advantages of Process Overwriting
 
-Bypassing MEM_PRIVATE Restrictions: Since this technique does not allocate new memory regions, it avoids triggering ZwQueryVirtualMemory checks for MEM_IMAGE.
+Bypassing **MEM_PRIVATE** Restrictions: Since this technique does not allocate new memory regions, it avoids triggering ZwQueryVirtualMemory checks for **MEM_IMAGE.**
 
 Stealth: Overwriting existing memory regions makes the process appear less suspicious to monitoring tools, as no new allocations are created.
 
@@ -72,7 +72,7 @@ TO NOTE:
 1. Should only be compiled as x86
 2. All files selected should be 32-bit
 3. Can only perform process hollowing between same application types (GUI TO GUI or Console to Console)
-4. Example executable (MissionEvasion.exe) uses c:\windows\syswow64\notepad.exe for the dummy process. Check if you have this executable, otherwise you may specify another one (refer to point 2) by changing DUMMY_PROCESS_FILE_PATH in config.ini
+4. Example executable (MissionEvasion.exe) uses _c:\windows\syswow64\notepad.exe_ for the dummy process. Check if you have this executable, otherwise you may specify another one (refer to point 2) by changing **DUMMY_PROCESS_FILE_PATH** in config.ini
 5. Project was compiled with Visual Studio 2022
 
 1. Apply all your changes to config.ini
