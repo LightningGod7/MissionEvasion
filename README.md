@@ -1,5 +1,5 @@
 # Introduction
-MissionEvasion is a project that explores advanced techniques for injecting payloads into processes. Initially, the project relied on Process Hollowing, a well-known technique. However, with the release of Windows 11 24H2, significant changes were introduced to the operating system’s process initialization mechanisms, specifically targeting executable memory regions created using VirtualAlloc. To bypass these restrictions, this project introduces Process Overwriting as a novel alternative.
+MissionEvasion is a project that explores advanced techniques for injecting payloads into processes. Initially, the project relied on a well-known technique called "Process Hollowing". However, with the release of Windows 11 24H2, significant changes were introduced to the operating system’s process initialization mechanisms, specifically targeting executable memory regions created using VirtualAlloc. To bypass these restrictions, this project introduces Process Overwriting as a novel alternative.
 
 Below, we describe both techniques in detail and provide an explanation of how the Windows 11 24H2 patch impacted traditional Process Hollowing.
 
