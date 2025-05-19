@@ -106,5 +106,4 @@ The tool uses a configuration file (`config.ini`) for persistent settings. Key c
 ## References
 - [Process Hollowing and PE Image Relocations](https://www.ired.team/offensive-security/code-injection-process-injection/process-hollowing-and-pe-image-relocations)
 - [Code Reversing](https://www.codereversing.com/archives/261)
-- [Code Reversing](https://www.codereversing.com/archives/261)
 - [Hasherezade's Process Hollowing on Win11 24H2](https://hshrzd.wordpress.com/2025/01/27/process-hollowing-on-windows-11-24h2/)
