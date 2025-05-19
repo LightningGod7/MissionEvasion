@@ -88,15 +88,10 @@ Options:
 
 ## Configuration
 The tool uses a configuration file (`config.ini`) for persistent settings. Key configuration options include:
-- Source input method (FILE/REG)
-- Injection technique (Hollow/Overwrite)
+- Source input method `FILE` or `REG`
+- Injection technique `Hollow` OR `Overwrite`
 - Source and destination PE paths
-- Registry settings for file storage
-
-## Requirements
-- Windows operating system
-- Visual Studio 2022 (for compilation)
-- Appropriate architecture (x86/x64) for your target environment
+- Registry settings for PE storing
 
 ## Important Notes
 1. Architecture matching is required:
@@ -105,9 +100,10 @@ The tool uses a configuration file (`config.ini`) for persistent settings. Key c
 2. Process type matching is required:
    - GUI to GUI
    - Console to Console
-3. Default dummy process path is `c:\windows\syswow64\notepad.exe` for 32-bit
-   - Can be changed in config.ini
+3. Sizing requirements
+   - Source image size must be smaller than Destination image size
 
 ## References
 - [Process Hollowing and PE Image Relocations](https://www.ired.team/offensive-security/code-injection-process-injection/process-hollowing-and-pe-image-relocations)
-- [Code Reversing](https://www.codereversing.com/archives/261) 
+- [Code Reversing](https://www.codereversing.com/archives/261)
+- [Hasherezade's Process Hollowing on Win11 24H2]https://hshrzd.wordpress.com/2025/01/27/process-hollowing-on-windows-11-24h2/
