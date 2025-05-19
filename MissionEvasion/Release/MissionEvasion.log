@@ -1,0 +1,23 @@
+﻿  base64.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\base64.cpp(70,52): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\base64.cpp(87,48): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+  GetInfo.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\GetInfo.cpp(121,64): warning C4244: 'initializing': conversion from 'ULONGLONG' to 'unsigned int', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\GetInfo.cpp(122,46): warning C4244: 'argument': conversion from 'ULONGLONG' to 'size_t', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\GetInfo.cpp(124,57): warning C4244: 'argument': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+  globals.cpp
+  MissionEvasion.cpp
+  PInjection.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(314,104): warning C4244: 'argument': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(407,107): warning C4244: 'argument': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+  RegHide.cpp
+  WinReg.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\WinReg.cpp(109,13): warning C4474: 'fprintf' : too many arguments passed for format string
+      C:\Users\Zeus\Documents\GitHub\MissionEvasion\WinReg.cpp(109,13):
+      placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+  
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 419 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  MissionEvasion.vcxproj -> C:\Users\Zeus\Documents\GitHub\MissionEvasion\Release\MissionEvasion.exe

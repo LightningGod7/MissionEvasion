@@ -8,7 +8,7 @@
 #include "base64.h"
 #include "WinReg.h"
 
-NewPEInfo GetPEInfo(const LPCSTR lpPathToExe)
+NewPEInfo GetPEInfo(LPCSTR lpPathToExe)
 {
 	NewPEInfo processInfo = { 0 };
 
@@ -70,7 +70,7 @@ NewPEInfo GetPEInfo(const LPCSTR lpPathToExe)
 	return processInfo;
 }
 
-std::vector<std::array<BYTE, READ_WRITE_SIZE>> SplitFile(const char* const pPathToFile)
+std::vector<std::array<BYTE, READ_WRITE_SIZE>> SplitFile(LPCSTR pPathToFile)
 {
 	// INITIALIZE VECTOR CLASS (STORES ARRAYS OF READ_WRITE_SIZE BYTES)
 	std::vector<std::array<BYTE, READ_WRITE_SIZE>> splitFile;
@@ -87,9 +87,8 @@ std::vector<std::array<BYTE, READ_WRITE_SIZE>> SplitFile(const char* const pPath
 	return splitFile;
 }
 
-int RegHide(const char* const strPathToSourceFile, HKEY hRegPath, const char* const strRegKey, std::string strValuePrefix)
+int RegHide(LPCSTR strPathToSourceFile, HKEY hRegPath, LPCSTR strRegKey, LPCSTR strValuePrefix)
 {
-
 	size_t ValueSuffix = 1;
 
 	// SPLIT UP THE FILE

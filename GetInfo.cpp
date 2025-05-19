@@ -1,13 +1,17 @@
 #include <string>
 #include <memory>
+#include <vector>
+#include <array>
+
 #include "ntapi.h"
 #include "globals.h"
-
 #include "PE.h"
-
 #include "GetInfo.h"
+#include "WinReg.h"
 
-
+// Update READ_WRITE_SIZE to match the size from ReadRegKeyValue
+#define READ_WRITE_SIZE 2048
+#define REG_READ_WRITE_SIZE 4096
 // Get the architecture of the PE file
 std::string getArch(const NewPEInfo& peInfo)
 {
@@ -96,15 +100,13 @@ NewPEInfo StorePEInMemory(
     DWORD bytesRead = 0;
     ULONGLONG fileSize = 0;
 
-    std::unique_ptr<BYTE[]> localBuffer;
-
     // ---------------------- MODE: FILE ----------------------
     if (mode == PEInputMode::FromFile && strPEPath != nullptr)
     {
         HANDLE hFile = CreateFileA(strPEPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile == INVALID_HANDLE_VALUE)
         {
-            printf("%s doesn't exist, failed to open file. Error: %lu\n", strPEPath, GetLastError());
+            printf("%s doesn't exist, failed to open file", strPEPath);
             return NewPEInfo;
         }
 
@@ -116,10 +118,10 @@ NewPEInfo StorePEInMemory(
             return NewPEInfo;
         }
 
-        localBuffer = std::unique_ptr<BYTE[]>(new BYTE[fileSize]);
-        memset(localBuffer.get(), 0, fileSize);
+        NewPEInfo.pFileData = std::unique_ptr<BYTE[]>(new BYTE[fileSize]);
+        memset(NewPEInfo.pFileData.get(), 0, fileSize);
 
-        if (!ReadFile(hFile, localBuffer.get(), fileSize, &bytesRead, NULL) || bytesRead != fileSize)
+        if (!ReadFile(hFile, NewPEInfo.pFileData.get(), fileSize, &bytesRead, NULL) || bytesRead != fileSize)
         {
             printf("Failed to read file. Error: %lu\n", GetLastError());
             CloseHandle(hFile);
@@ -139,39 +141,49 @@ NewPEInfo StorePEInMemory(
             return NewPEInfo;
         }
 
-        DWORD index = 0, type = 0;
-        CHAR valueName[256];
-        DWORD valueSize = 0;
-        DWORD nameSize = sizeof(valueName);
+        std::vector<std::array<BYTE, REG_READ_WRITE_SIZE>> splitFile;
+        size_t ulValueSuffix = 1;
+        bool bErrorOccurred = false;
+        bool bReadStatus = false;
 
-        // First get the size of the value
-        if (RegQueryValueExA(hKey, regValuePrefix, NULL, &type, NULL, &valueSize) != ERROR_SUCCESS || type != REG_BINARY)
+        // Read first part
+        std::string strFullName = regValuePrefix + std::to_string(ulValueSuffix);
+        std::array<BYTE, REG_READ_WRITE_SIZE> partFile = ReadRegKeyValue(regKeyPath, strFullName.c_str(), bErrorOccurred, bReadStatus);
+
+        // ITERATE THROUGH ALL VALUES WITH THE NAME ['Part#'] OF THE REGISTRY KEY
+        while (!bErrorOccurred)
         {
-            printf("Failed to get registry value size: %s\n", regValuePrefix);
+            // APPEND ARRAY INTO VECTOR
+            splitFile.push_back(partFile);
+
+            ++ulValueSuffix;
+            strFullName = regValuePrefix + std::to_string(ulValueSuffix);
+
+            // STORE VALUE INTO ARRAY
+            partFile = ReadRegKeyValue(regKeyPath, strFullName.c_str(), bErrorOccurred, bReadStatus);
+        }
+
+        if (splitFile.empty())
+        {
+            printf("No valid registry parts found\n");
             RegCloseKey(hKey);
             return NewPEInfo;
         }
 
-        // Allocate buffer on heap
-        std::unique_ptr<BYTE[]> tempData(new BYTE[valueSize]);
-        if (!tempData)
-        {
-            printf("Failed to allocate memory for registry data\n");
-            RegCloseKey(hKey);
-            return NewPEInfo;
-        }
+        // INITIALIZE UNIQUE POINTER TO START OF EACH ARRAY IN THE VECTOR
+        NewPEInfo.pFileData = std::unique_ptr<BYTE[]>(new BYTE[splitFile.size() * READ_WRITE_SIZE]);
+        memset(NewPEInfo.pFileData.get(), 0, splitFile.size() * READ_WRITE_SIZE);
 
-        // Now read the actual value
-        if (RegQueryValueExA(hKey, regValuePrefix, NULL, &type, tempData.get(), &valueSize) != ERROR_SUCCESS)
+        // ITERATE THROUGH ALL ARRAYS IN THE VECTOR
+        size_t ulArrayIndex = 0;
+        for (const auto& split : splitFile)
         {
-            printf("Failed to read binary registry value: %s\n", regValuePrefix);
-            RegCloseKey(hKey);
-            return NewPEInfo;
+            // MEMCPY ARRAY TO THE SOURCE PROCESS INFO CLASS FILEDATA BUFFER
+            memcpy(&NewPEInfo.pFileData.get()[ulArrayIndex * READ_WRITE_SIZE], 
+                   split.data(),
+                   READ_WRITE_SIZE);
+            ++ulArrayIndex;
         }
-
-        localBuffer = std::unique_ptr<BYTE[]>(new BYTE[valueSize]);
-        memcpy(localBuffer.get(), tempData.get(), valueSize);
-        fileSize = valueSize;
 
         RegCloseKey(hKey);
     }
@@ -179,8 +191,8 @@ NewPEInfo StorePEInMemory(
     // ---------------------- MODE: BUFFER ----------------------
     else if (mode == PEInputMode::FromBuffer && pBuffer && bufferSize > 0)
     {
-        localBuffer = std::unique_ptr<BYTE[]>(new BYTE[bufferSize]);
-        memcpy(localBuffer.get(), pBuffer, bufferSize);
+        NewPEInfo.pFileData = std::unique_ptr<BYTE[]>(new BYTE[bufferSize]);
+        memcpy(NewPEInfo.pFileData.get(), pBuffer, bufferSize);
         fileSize = bufferSize;
     }
 
@@ -191,7 +203,6 @@ NewPEInfo StorePEInMemory(
     }
 
     // ---------------------- PE Parsing ----------------------
-    NewPEInfo.pFileData = std::move(localBuffer);
     NewPEInfo.pDosHeader = reinterpret_cast<IMAGE_DOS_HEADER*>(NewPEInfo.pFileData.get());
 
 #if defined(_WIN64)
