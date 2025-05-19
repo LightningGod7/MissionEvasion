@@ -1,0 +1,22 @@
+﻿  base64.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\base64.cpp(59,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\base64.cpp(70,52): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\base64.cpp(87,48): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+  GetInfo.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\GetInfo.cpp(122,49): warning C4244: 'argument': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+  globals.cpp
+  MissionEvasion.cpp
+  PInjection.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(277,60): warning C4311: 'type cast': pointer truncation from 'PVOID' to 'DWORD'
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(277,60): warning C4302: 'type cast': truncation from 'PVOID' to 'DWORD'
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(288,104): warning C4244: 'argument': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\PInjection.cpp(288,88): warning C4244: 'argument': conversion from 'SIZE_T' to 'DWORD', possible loss of data
+  RegHide.cpp
+  WinReg.cpp
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\WinReg.cpp(57,33): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Zeus\Documents\GitHub\MissionEvasion\WinReg.cpp(109,13): warning C4474: 'fprintf' : too many arguments passed for format string
+      C:\Users\Zeus\Documents\GitHub\MissionEvasion\WinReg.cpp(109,13):
+      placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+  
+  Generating Code...
+  MissionEvasion.vcxproj -> C:\Users\Zeus\Documents\GitHub\MissionEvasion\x64\Debug\MissionEvasion.exe

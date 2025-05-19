@@ -15,57 +15,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="globals.cpp">
+    <ClCompile Include="MissionEvasion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="base64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GetInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PInjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinReg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegHide.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WinReg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PInjection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RegHide.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ntapi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="globals.h">
+    <ClInclude Include="base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GetInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GetInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PInjection.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RegHide.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinReg.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="base64.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="base64.h">
+    <ClInclude Include="ntapi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\Fileless Malware\Fileless Malware\config.ini">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClInclude Include="RegHide.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PInjection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
