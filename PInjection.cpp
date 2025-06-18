@@ -59,7 +59,7 @@ bool WritePEHeader(
     memcpy(padded_payload, srcPEInfo.pFileData.get(), ulSrcImageSize);
 
     // Write the padded image to the destination process
-    result = WriteProcessMemory(destProcessInfo.hProcess,destImageBase,padded_payload,DestImageSize,&dwBytesWritten);
+    result = WriteProcessMemory(destProcessInfo.hProcess,destImageBase,padded_payload,ulSrcImageSize,&dwBytesWritten);
     free(padded_payload);
     return result;
 #else
